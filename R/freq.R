@@ -29,11 +29,34 @@
 #==================================================================================
 require("dplyr")
 
-freq <- function(df,..., col_names=c("Variable","Values","n","rel.freq"), 
+#' Title
+#'
+#' @param df data
+#' @param ... variables (no quotes needed)
+#' @param col_names vector with names for the 4 columns
+#' @param decimales number of decimals to show
+#' @param show_warnings 
+#' @param total 
+#' @param sort_by_values 
+#' @param sort_by_freq 
+#' @param sort_by_percent 
+#' @param sort_decreasing 
+#' @param debug
+#'
+#' @return list of dataframes (1 per variable)
+#' @export
+#'
+#' @examples
+freq <- function(df,..., col_names=c("Variable","Values","n","rel.freq"), group_by = c(""),
                  decimales=2, show_warnings = TRUE, total=TRUE,
-                 sort_by_values=TRUE, sort_by_freq=FALSE, sort_by_percent=FALSE, sort_decreasing = TRUE) {
+                 sort_by_values=FALSE, sort_by_freq=FALSE, sort_by_percent=FALSE, sort_decreasing = TRUE,
+                 debug = FALSE) {
   
-  # cat(col_names)
+  if (debug) {
+    
+    print(paste("Column names: ",col_names))
+    # if (exists(group_by)) cat(paste("\n",group_by))
+  }
   
   if (length(col_names) != 4 ) stop("Numero de columnas en 'col_names' debería ser 4")
   
@@ -42,12 +65,11 @@ freq <- function(df,..., col_names=c("Variable","Values","n","rel.freq"),
   result_df <- list()
   
   
-  if (length(vars$group_by_col) > 0)
+  if (length(group_by)>0)
   {
-    group <- vars$group_by_col
-    print(group)
-    df <- df %>% group_by(!! group)  
-    vars$group_by_col <- NULL
+    group <- group_by
+    if (debug) cat(paste("\n Group by: ",group,"\n"))
+    df <- df %>% group_by_at(vars(one_of(group)))
   }
   
   
@@ -60,7 +82,6 @@ freq <- function(df,..., col_names=c("Variable","Values","n","rel.freq"),
     names(res) <- col_names
     
     result_df[[length(result_df)+1]] <- as.data.frame(res)
-    
   }
   
   if (exists("result_df"))
