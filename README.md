@@ -1,2 +1,3 @@
 # udaicR
-base udaic functions for R
+Base R functions used by UdAIC
+
